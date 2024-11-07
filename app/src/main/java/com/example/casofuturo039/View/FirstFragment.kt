@@ -8,27 +8,31 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import com.example.casofuturo039.ViewModel.CoursesViewModel
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.casofuturo039.CoursesAdapter
+import com.example.casofuturo039.CoursesViewModel
 import com.example.casofuturo039.databinding.FragmentFirstBinding
-
+import com.example.casofuturo039.R
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class FirstFragment : Fragment() {
 
-    private var _binding: FragmentFirstBinding? = null
+    private lateinit var  mBinding : FragmentFirstBinding
     private val mViewModel : CoursesViewModel by activityViewModels()
+
     // This property is only valid between onCreateView and
     // onDestroyView.
-    private val binding get() = _binding!!
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
 
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
-        return binding.root
+        mBinding = FragmentFirstBinding.inflate(inflater, container, false)
+        return mBinding.root
 
     }
 
@@ -36,18 +40,43 @@ class FirstFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        mViewModel.getCoursesList().observe(viewLifecycleOwner, Observer {
 
+        // DEBEMOS INTANCIAR ADAPTER
+
+        val adapter = CoursesAdapter()
+        mBinding.recyclerView.adapter= adapter
+        mBinding.recyclerView.layoutManager= LinearLayoutManager(context)
+        mViewModel.getCoursesList().observe(viewLifecycleOwner, Observer {
 
             it?.let {
                 Log.d("Listado", it.toString())
+                adapter.update(it)
             }
+
         })
+
+
+        // MÉTODO PARA SELECCIONAR
+
+        adapter.selectedCourse().observe(viewLifecycleOwner, Observer {
+            it?.let {
+                // válidar si capta la seleccion
+                Log.d("Seleccion", it.id.toString())
+
+            }
+            val bundle = Bundle().apply {
+                putString("courseId", it.id)
+            }
+            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment, bundle)
+
+        })
+
+
 
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+
     }
 }
