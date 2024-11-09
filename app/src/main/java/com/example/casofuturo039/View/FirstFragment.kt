@@ -55,6 +55,9 @@ class FirstFragment : Fragment() {
 
         })
 
+        // Llamamos al método para obtener los detalles del curso con id 101 desde la red.
+        mViewModel.getCourseDetailByidFromInternet("101")
+
 
         // MÉTODO PARA SELECCIONAR
 
